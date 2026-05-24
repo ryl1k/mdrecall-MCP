@@ -34,6 +34,29 @@ def test_query_empty_filters_returns_all_notes(vault: Vault) -> None:
     assert len(results) >= 6
 
 
+def test_query_null_matches_explicit_null(vault: Vault) -> None:
+    """beta.md has `github: null` explicitly."""
+    results = query_frontmatter(vault, {"type": "project", "github": None})
+    paths = {r["path"] for r in results}
+    assert "010-projects/beta.md" in paths
+
+
+def test_query_null_matches_absent_field(vault: Vault) -> None:
+    """zeta.md has `github: null`; beta.md omits `local-paths` entirely — both should match."""
+    results = query_frontmatter(vault, {"local-paths": None})
+    paths = {r["path"] for r in results}
+    assert "010-projects/beta.md" in paths
+
+
+def test_query_null_combined_with_other_keys(vault: Vault) -> None:
+    """Active projects with no github — the original dogfooding question."""
+    results = query_frontmatter(
+        vault, {"type": "project", "status": "active", "github": None}
+    )
+    paths = {r["path"] for r in results}
+    assert paths == {"010-projects/zeta.md", "060-hackathons/delta.md"}
+
+
 def test_query_no_match(vault: Vault) -> None:
     results = query_frontmatter(vault, {"status": "nonexistent"})
     assert results == []

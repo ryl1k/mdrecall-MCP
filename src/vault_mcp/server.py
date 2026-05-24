@@ -134,7 +134,8 @@ def query_frontmatter(
 
     Multiple keys combine with AND. A list value for a key is any-of (e.g.
     `{"tech": ["postgresql"]}` matches notes whose `tech` array contains
-    `postgresql`).
+    `postgresql`). A `null` value matches notes where the field is null or
+    absent (e.g. `{"github": null}` finds notes with no github remote).
     """
 
     return _query_frontmatter(vault(), filters, limit=limit)

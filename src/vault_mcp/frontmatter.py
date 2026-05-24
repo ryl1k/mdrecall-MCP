@@ -26,10 +26,17 @@ def _matches_one(note_value: Any, filter_value: Any) -> bool:
 
 
 def matches_filters(note: Note, filters: dict[str, Any]) -> bool:
-    """Returns True iff every (key, value) in `filters` matches the note."""
+    """Returns True iff every (key, value) in `filters` matches the note.
+
+    A filter value of `None` matches notes where the field is null or absent.
+    """
 
     for key, expected in filters.items():
         actual = note.frontmatter.get(key)
+        if expected is None:
+            if actual is not None:
+                return False
+            continue
         if actual is None:
             return False
         if not _matches_one(actual, expected):
@@ -45,6 +52,8 @@ def query_frontmatter(
     """Return notes whose frontmatter satisfies all filters.
 
     Multiple keys combine with AND; list values within one key are any-of.
+    A `None` value matches notes where the field is null or absent (e.g.
+    `{"github": None}` finds notes without a github remote).
     """
 
     matched: list[dict[str, Any]] = []
