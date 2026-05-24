@@ -15,4 +15,4 @@ jobs:
       - uses: googleapis/release-please-action@v4
         with:
           release-type: python
-          package-name: vault-mcp
+          package-name: mdrecall

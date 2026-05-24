@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from vault_mcp.backlinks import find_backlinks
-from vault_mcp.frontmatter import query_frontmatter
-from vault_mcp.vault import Vault
+from mdrecall.backlinks import find_backlinks
+from mdrecall.frontmatter import query_frontmatter
+from mdrecall.vault import Vault
 
 
 def test_query_status_active(vault: Vault) -> None:

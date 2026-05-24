@@ -9,10 +9,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from vault_mcp.backlinks import find_backlinks
-from vault_mcp.frontmatter import query_frontmatter
-from vault_mcp.search import search_notes
-from vault_mcp.vault import Vault
+from mdrecall.backlinks import find_backlinks
+from mdrecall.frontmatter import query_frontmatter
+from mdrecall.search import search_notes
+from mdrecall.vault import Vault
 
 
 def main() -> None:

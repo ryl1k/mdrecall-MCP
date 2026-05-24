@@ -29,8 +29,7 @@
 ## Case 5 — Date filter via ISO string
 
 - **Input**: `query_frontmatter(filters={"started": "2026-05-24"}, limit=3)`
-- **Expected**: `010-projects/vault-mcp.md` (the only note started that
-  day).
+- **Expected**: the only note in the vault started on that exact date.
 - **Validates**: YAML-parsed `datetime.date` values match the ISO string
   form of the filter — no type mismatch.
 

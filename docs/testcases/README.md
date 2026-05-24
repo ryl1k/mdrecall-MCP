@@ -1,6 +1,6 @@
 # Test Cases
 
-Manual validation matrix used to certify `vault-mcp` against a real Obsidian
+Manual validation matrix used to certify `mdrecall` against a real Obsidian
 vault. Every tool was exercised across 10 use cases (1 for `list_folders`
 since it takes no parameters) covering happy paths, filters, error paths,
 and known edge cases.

@@ -1,6 +1,6 @@
-# vault-mcp
+# mdrecall
 
-[![CI](https://github.com/ryl1k/Vault-MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/ryl1k/Vault-MCP/actions/workflows/ci.yml)
+[![CI](https://github.com/ryl1k/mdrecall/actions/workflows/ci.yml/badge.svg)](https://github.com/ryl1k/mdrecall/actions/workflows/ci.yml)
 
 Local MCP server that exposes a folder of markdown notes (e.g. an Obsidian
 vault) to Claude Desktop and Claude Code as a queryable memory layer.
@@ -18,12 +18,12 @@ Six tools: `list_folders`, `list_notes`, `read_note`, `search_notes`,
 ## Install
 
 ```bash
-git clone https://github.com/ryl1k/Vault-MCP.git
-cd Vault-MCP
+git clone https://github.com/ryl1k/mdrecall.git
+cd mdrecall
 pip install -e .
 ```
 
-This registers a `vault-mcp` console script that starts the stdio server.
+This registers an `mdrecall` console script that starts the stdio server.
 
 ## Configuration
 
@@ -69,8 +69,8 @@ inside the JSON string:
 ```json
 {
   "mcpServers": {
-    "vault": {
-      "command": "vault-mcp",
+    "mdrecall": {
+      "command": "mdrecall",
       "env": { "VAULT_PATH": "D:\\Documents\\Knowledge" }
     }
   }
@@ -82,22 +82,22 @@ macOS / Linux:
 ```json
 {
   "mcpServers": {
-    "vault": {
-      "command": "vault-mcp",
+    "mdrecall": {
+      "command": "mdrecall",
       "env": { "VAULT_PATH": "/Users/you/Documents/Knowledge" }
     }
   }
 }
 ```
 
-If Claude Desktop can't find `vault-mcp` on PATH, point it at Python directly:
+If Claude Desktop can't find `mdrecall` on PATH, point it at Python directly:
 
 ```json
 {
   "mcpServers": {
-    "vault": {
+    "mdrecall": {
       "command": "/absolute/path/to/python",
-      "args": ["-m", "vault_mcp.server"],
+      "args": ["-m", "mdrecall.server"],
       "env": { "VAULT_PATH": "/path/to/vault" }
     }
   }
@@ -109,7 +109,7 @@ Restart Claude Desktop after editing.
 ## Wiring into Claude Code
 
 ```bash
-claude mcp add vault vault-mcp -e VAULT_PATH=/path/to/your/vault
+claude mcp add mdrecall mdrecall -e VAULT_PATH=/path/to/your/vault
 ```
 
 Quote the path if it contains spaces or special characters. Start a new

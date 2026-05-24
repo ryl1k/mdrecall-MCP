@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "vault-mcp"
+name = "mdrecall"
 version = "0.1.0"
-description = "Local MCP server exposing an Obsidian knowledge vault to Claude Desktop"
+description = "Local MCP server exposing a markdown knowledge vault to Claude Desktop"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -24,10 +24,10 @@ dev = [
 ]
 
 [project.scripts]
-vault-mcp = "vault_mcp.server:main"
+mdrecall = "mdrecall.server:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/vault_mcp"]
+packages = ["src/mdrecall"]
 
 [tool.ruff]
 line-length = 100
@@ -36,7 +36,7 @@ target-version = "py311"
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src/vault_mcp"]
+files = ["src/mdrecall"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

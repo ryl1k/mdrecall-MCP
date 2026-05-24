@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from vault_mcp.search import search_notes
-from vault_mcp.vault import Vault
+from mdrecall.search import search_notes
+from mdrecall.vault import Vault
 
 
 def test_search_substring_case_insensitive(vault: Vault) -> None:

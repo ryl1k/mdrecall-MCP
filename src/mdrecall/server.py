@@ -20,7 +20,7 @@ logging.basicConfig(
     stream=sys.stderr,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
-logger = logging.getLogger("vault_mcp")
+logger = logging.getLogger("mdrecall")
 
 DEFAULT_VAULT = Path.home() / "Documents" / "Knowledge"
 
@@ -57,7 +57,7 @@ def vault() -> Vault:
     return _VAULT
 
 
-mcp = FastMCP("vault-mcp")
+mcp = FastMCP("mdrecall")
 
 
 @mcp.tool()

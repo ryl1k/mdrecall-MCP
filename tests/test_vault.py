@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vault_mcp.vault import Vault, canonical_path
+from mdrecall.vault import Vault, canonical_path
 
 
 def test_iter_notes_recursive_skips_archive(vault: Vault) -> None:
