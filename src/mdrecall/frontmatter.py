@@ -42,10 +42,10 @@ def _matches_one(note_value: Any, filter_value: Any) -> bool:
     if isinstance(nv, list):
         if isinstance(fv, list):
             return any(item in nv for item in fv)
-        return fv in nv
+        return bool(fv in nv)
     if isinstance(fv, list):
-        return nv in fv
-    return nv == fv
+        return bool(nv in fv)
+    return bool(nv == fv)
 
 
 def matches_filters(note: Note, filters: dict[str, Any]) -> bool:
