@@ -1,5 +1,7 @@
 # vault-mcp
 
+[![CI](https://github.com/ryl1k/Vault-MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/ryl1k/Vault-MCP/actions/workflows/ci.yml)
+
 Local MCP server that exposes a folder of markdown notes (e.g. an Obsidian
 vault) to Claude Desktop and Claude Code as a queryable memory layer.
 Read-only, stdio transport, no network calls.

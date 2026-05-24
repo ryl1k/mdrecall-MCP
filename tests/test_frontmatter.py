@@ -50,9 +50,7 @@ def test_query_null_matches_absent_field(vault: Vault) -> None:
 
 def test_query_null_combined_with_other_keys(vault: Vault) -> None:
     """Active projects with no github — the original dogfooding question."""
-    results = query_frontmatter(
-        vault, {"type": "project", "status": "active", "github": None}
-    )
+    results = query_frontmatter(vault, {"type": "project", "status": "active", "github": None})
     paths = {r["path"] for r in results}
     assert paths == {"010-projects/zeta.md", "060-hackathons/delta.md"}
 

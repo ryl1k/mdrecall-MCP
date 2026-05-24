@@ -36,7 +36,6 @@ def test_search_no_results(vault: Vault) -> None:
 
 def test_search_whitespace_matches_hyphen(vault: Vault) -> None:
     """Query 'agentic loop' should match 'agentic-loop' and 'agentic loops' too."""
-    import frontmatter as fm
     from pathlib import Path
 
     target = Path(__file__).parent / "fixtures" / "010-projects" / "epsilon.md"

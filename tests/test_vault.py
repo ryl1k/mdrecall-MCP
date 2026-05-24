@@ -42,6 +42,7 @@ def test_cache_returns_same_object_until_mtime_changes(vault: Vault, fixture_roo
     target = fixture_root / "010-projects" / "alpha.md"
     new_mtime = note1.mtime + 5
     import os
+
     os.utime(target, (new_mtime, new_mtime))
     note3 = vault.get_note("010-projects/alpha.md")
     assert note3 is not note1

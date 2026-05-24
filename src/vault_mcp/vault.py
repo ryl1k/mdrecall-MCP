@@ -80,8 +80,7 @@ class Note:
 
     def wikilink_targets(self) -> list[str]:
         return [
-            _canonicalize_target(m.group(1))
-            for m in WIKILINK_RE.finditer(self.linkable_body())
+            _canonicalize_target(m.group(1)) for m in WIKILINK_RE.finditer(self.linkable_body())
         ]
 
 
@@ -200,19 +199,13 @@ class Vault:
             files = [
                 p
                 for p in base.iterdir()
-                if p.is_file()
-                and p.suffix.lower() == ".md"
-                and not p.name.startswith((".", "_"))
+                if p.is_file() and p.suffix.lower() == ".md" and not p.name.startswith((".", "_"))
             ]
         return [self._load_note(p) for p in files]
 
     def top_level_folders(self) -> list[Path]:
         return sorted(
-            (
-                p
-                for p in self.root.iterdir()
-                if p.is_dir() and not p.name.startswith((".", "_"))
-            ),
+            (p for p in self.root.iterdir() if p.is_dir() and not p.name.startswith((".", "_"))),
             key=lambda p: p.name,
         )
 
