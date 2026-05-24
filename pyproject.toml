@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vault-mcp"
+version = "0.1.0"
+description = "Local MCP server exposing an Obsidian knowledge vault to Claude Desktop"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "ryl1k" }]
+dependencies = [
+    "mcp>=1.27",
+    "python-frontmatter>=1.1",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "mypy>=1.10",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+vault-mcp = "vault_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vault_mcp"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src/vault_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
