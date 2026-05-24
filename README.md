@@ -212,6 +212,13 @@ ruff format src tests
 mypy src
 ```
 
+### Test cases
+
+In addition to the pytest suite, [`docs/testcases/`](docs/testcases/README.md)
+documents 51 manual integration cases used to validate every tool against
+a live vault. Each case lists the exact call, the expected outcome, and
+the behavior it certifies.
+
 ## Logging
 
 The server logs to stderr only. stdio MCP servers must never write to stdout —
