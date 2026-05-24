@@ -13,7 +13,7 @@ from mcp.server.fastmcp import FastMCP
 from .backlinks import find_backlinks as _find_backlinks
 from .frontmatter import query_frontmatter as _query_frontmatter
 from .search import search_notes as _search_notes
-from .vault import WIKILINK_RE, Vault, canonical_path
+from .vault import Vault
 
 logging.basicConfig(
     level=logging.INFO,
@@ -94,13 +94,12 @@ def read_note(path: str) -> dict[str, Any]:
 
     v = vault()
     note = v.get_note(path)
-    targets = [canonical_path(m.group(1)) for m in WIKILINK_RE.finditer(note.body)]
     seen: set[str] = set()
     unique_targets: list[str] = []
-    for t in targets:
-        if t not in seen:
-            seen.add(t)
-            unique_targets.append(t)
+    for target in note.wikilink_targets():
+        if target not in seen:
+            seen.add(target)
+            unique_targets.append(target)
     return {
         "path": note.path,
         "frontmatter": note.frontmatter,

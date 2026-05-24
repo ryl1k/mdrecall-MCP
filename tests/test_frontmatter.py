@@ -8,7 +8,11 @@ from vault_mcp.vault import Vault
 def test_query_status_active(vault: Vault) -> None:
     results = query_frontmatter(vault, {"status": "active"})
     paths = {r["path"] for r in results}
-    assert paths == {"010-projects/alpha.md", "060-hackathons/delta.md"}
+    assert paths == {
+        "010-projects/alpha.md",
+        "010-projects/zeta.md",
+        "060-hackathons/delta.md",
+    }
 
 
 def test_query_tech_list_any_of(vault: Vault) -> None:
@@ -43,7 +47,11 @@ def test_query_limit(vault: Vault) -> None:
 def test_backlinks_to_postgresql(vault: Vault) -> None:
     results = find_backlinks(vault, "070-concepts/tech/postgresql.md")
     paths = {r["path"] for r in results}
-    assert paths == {"010-projects/alpha.md", "010-projects/beta.md"}
+    assert paths == {
+        "010-projects/alpha.md",
+        "010-projects/beta.md",
+        "010-projects/zeta.md",
+    }
 
 
 def test_backlinks_with_alias_form(vault: Vault) -> None:
@@ -60,6 +68,12 @@ def test_backlinks_bare_basename(vault: Vault) -> None:
     results = find_backlinks(vault, "any/folder/gamma-helper.md")
     paths = {r["path"] for r in results}
     assert "010-projects/gamma.md" in paths
+
+
+def test_backlinks_ignores_code_span_links(vault: Vault) -> None:
+    """A wikilink inside backticks or a fenced block must not produce a backlink."""
+    assert find_backlinks(vault, "any/folder/fake-inline.md") == []
+    assert find_backlinks(vault, "any/folder/fake-fenced.md") == []
 
 
 def test_backlinks_context_contains_link(vault: Vault) -> None:

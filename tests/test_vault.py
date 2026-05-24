@@ -21,6 +21,7 @@ def test_iter_notes_non_recursive(vault: Vault) -> None:
         "010-projects/alpha.md",
         "010-projects/beta.md",
         "010-projects/gamma.md",
+        "010-projects/zeta.md",
     }
 
 
@@ -66,4 +67,14 @@ def test_canonical_path() -> None:
 
 def test_count_notes_skips_underscored_dirs(vault: Vault, fixture_root: Path) -> None:
     count = vault.count_notes(fixture_root / "010-projects")
-    assert count == 3
+    assert count == 4
+
+
+def test_wikilink_extraction_skips_code_spans(vault: Vault) -> None:
+    note = vault.get_note("010-projects/zeta.md")
+    targets = note.wikilink_targets()
+    assert "070-concepts/tech/python" in targets
+    assert "070-concepts/tech/postgresql" in targets
+    assert "fake-inline" not in targets
+    assert "fake-fenced" not in targets
+    assert "also-fake" not in targets
