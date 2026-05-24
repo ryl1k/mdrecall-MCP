@@ -22,7 +22,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("vault_mcp")
 
-DEFAULT_VAULT = Path(r"D:\Documents\Knowledge")
+DEFAULT_VAULT = Path.home() / "Documents" / "Knowledge"
 
 FOLDER_DESCRIPTIONS: dict[str, str] = {
     "000-index": "Entry points and Maps of Content.",
@@ -42,7 +42,7 @@ FOLDER_DESCRIPTIONS: dict[str, str] = {
 
 def _vault() -> Vault:
     raw = os.environ.get("VAULT_PATH")
-    root = Path(raw) if raw else DEFAULT_VAULT
+    root = Path(raw).expanduser() if raw else DEFAULT_VAULT
     return Vault(root)
 
 
