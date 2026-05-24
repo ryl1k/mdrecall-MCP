@@ -179,9 +179,11 @@ class Vault:
         return abs_path
 
     def get_note(self, path: str) -> Note:
-        """Read and parse a single note at a vault-relative path."""
+        """Read and parse a single note. The `.md` suffix is optional."""
 
         abs_path = self.resolve(path)
+        if not abs_path.is_file() and not path.lower().endswith(".md"):
+            abs_path = self.resolve(path + ".md")
         if not abs_path.is_file():
             raise FileNotFoundError(f"Note not found: {path}")
         return self._load_note(abs_path)

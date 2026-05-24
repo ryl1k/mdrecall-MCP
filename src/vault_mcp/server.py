@@ -90,7 +90,10 @@ def list_notes(folder: str, recursive: bool = False) -> list[dict[str, Any]]:
 
 @mcp.tool()
 def read_note(path: str) -> dict[str, Any]:
-    """Read a single note. Returns frontmatter, body, and resolved wikilink targets."""
+    """Read a single note. Returns frontmatter, body, and resolved wikilink targets.
+
+    Accepts paths with or without the `.md` suffix.
+    """
 
     v = vault()
     note = v.get_note(path)

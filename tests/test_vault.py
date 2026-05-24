@@ -54,6 +54,17 @@ def test_get_note_missing_raises(vault: Vault) -> None:
         vault.get_note("does/not/exist.md")
 
 
+def test_get_note_accepts_path_without_md_suffix(vault: Vault) -> None:
+    note = vault.get_note("010-projects/alpha")
+    assert note.path == "010-projects/alpha.md"
+    assert note.title == "Alpha Service"
+
+
+def test_get_note_missing_still_raises_without_suffix(vault: Vault) -> None:
+    with pytest.raises(FileNotFoundError):
+        vault.get_note("010-projects/no-such-note")
+
+
 def test_path_escape_rejected(vault: Vault) -> None:
     with pytest.raises(ValueError):
         vault.get_note("../outside.md")
