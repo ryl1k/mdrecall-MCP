@@ -83,12 +83,14 @@ search_notes(query="auth", types=["project"], status=["active"])
 
 ### `query_frontmatter(filters, limit=50)`
 Structured filter on frontmatter only. Multiple keys combine with AND. A list
-value for one key is any-of.
+value for one key is any-of. A `null` value matches notes where the field is
+null *or* absent.
 
 ```
 query_frontmatter(filters={"status": "active"})
 query_frontmatter(filters={"tech": ["postgresql"]})
 query_frontmatter(filters={"status": "active", "tech": ["python"]})
+query_frontmatter(filters={"status": "active", "github": null})  # actives with no remote
 ```
 
 ### `find_backlinks(path)`
@@ -103,13 +105,34 @@ find_backlinks(path="070-concepts/tech/react.md")
 
 ## Conventions
 
-- Vault-relative paths use forward slashes and include `.md`
-  (e.g. `010-projects/chess.md`).
+- Vault-relative paths use forward slashes. The `.md` suffix is optional for
+  `read_note` (`010-projects/chess` and `010-projects/chess.md` both work).
 - Folders starting with `.` or `_` (e.g. `_archive/`) are excluded from
   listings, searches, and backlinks.
 - Wikilink resolution is case-insensitive and treats `.md` as optional.
 - Notes are parsed once and cached in memory; the cache invalidates per file
   when the file's mtime changes.
+
+## Semantics worth knowing
+
+These are quiet behaviors that surprised the author during dogfooding. None
+are bugs; calling them out so they don't bite:
+
+- **`search_notes` is literal substring, not regex.** Query is escaped and
+  ranked by hit count. Whitespace and hyphens in the query are treated as one
+  separator class (`agentic loop` matches `agentic-loop` and `agentic loops`).
+  Regex metacharacters in the query match literally.
+- **`query_frontmatter` empty list = no filter.** A falsy value (`[]`, `""`,
+  `null` *in the search-filter list-args*) is ignored, not "match nothing".
+  Use a missing key when you mean "don't filter". Use explicit `null` in
+  `filters` to mean "field must be null or absent".
+- **Path case-sensitivity follows the OS.** On Windows the filesystem is
+  case-insensitive, so `Chess.md` resolves to `chess.md`. On Linux/macOS the
+  same lookup would fail. Returned `path` fields are always the canonical
+  on-disk casing; pass them back verbatim.
+- **Wikilinks inside fenced code blocks and inline code spans are ignored.**
+  Prose like `[[react]]` in a code span won't pollute `read_note.wikilinks`
+  or appear as a backlink. Only real graph edges are extracted.
 
 ## Development
 
