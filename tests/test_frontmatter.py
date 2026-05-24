@@ -57,6 +57,27 @@ def test_query_null_combined_with_other_keys(vault: Vault) -> None:
     assert paths == {"010-projects/zeta.md", "060-hackathons/delta.md"}
 
 
+def test_query_matches_date_via_iso_string(vault: Vault) -> None:
+    """alpha.md has `started: 2026-01-15`, parsed by YAML as datetime.date."""
+    results = query_frontmatter(vault, {"started": "2026-01-15"})
+    paths = {r["path"] for r in results}
+    assert "010-projects/alpha.md" in paths
+
+
+def test_query_string_filter_is_case_insensitive(vault: Vault) -> None:
+    results = query_frontmatter(vault, {"status": "ACTIVE"})
+    paths = {r["path"] for r in results}
+    assert "010-projects/alpha.md" in paths
+    assert "060-hackathons/delta.md" in paths
+
+
+def test_query_list_filter_is_case_insensitive(vault: Vault) -> None:
+    """`tech: [python, ...]` should match `{"tech": "PYTHON"}` too."""
+    results = query_frontmatter(vault, {"tech": "PYTHON"})
+    paths = {r["path"] for r in results}
+    assert "010-projects/alpha.md" in paths
+
+
 def test_query_no_match(vault: Vault) -> None:
     results = query_frontmatter(vault, {"status": "nonexistent"})
     assert results == []
