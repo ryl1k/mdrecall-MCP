@@ -21,6 +21,7 @@ def test_iter_notes_non_recursive(vault: Vault) -> None:
         "010-projects/alpha.md",
         "010-projects/beta.md",
         "010-projects/gamma.md",
+        "010-projects/unicode-note.md",
         "010-projects/zeta.md",
     }
 
@@ -79,7 +80,15 @@ def test_canonical_path() -> None:
 
 def test_count_notes_skips_underscored_dirs(vault: Vault, fixture_root: Path) -> None:
     count = vault.count_notes(fixture_root / "010-projects")
-    assert count == 4
+    assert count == 5
+
+
+def test_get_note_reads_utf8_with_non_ascii_content(vault: Vault) -> None:
+    """Vault must read files as UTF-8 regardless of OS locale (Windows defaults to cp1252)."""
+    note = vault.get_note("010-projects/unicode-note.md")
+    assert "розрахунково-графічна" in note.body
+    assert "καλημέρα" in note.body
+    assert note.title.startswith("Unicode Note")
 
 
 def test_wikilink_extraction_skips_code_spans(vault: Vault) -> None:

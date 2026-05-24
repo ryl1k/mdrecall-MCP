@@ -150,7 +150,8 @@ class Vault:
             if cached is not None and cached.mtime == mtime:
                 return cached.note
         try:
-            post = frontmatter.load(str(abs_path))
+            with abs_path.open("r", encoding="utf-8") as fh:
+                post = frontmatter.load(fh)
         except Exception as exc:
             logger.warning("Failed to parse frontmatter for %s: %s", rel, exc)
             post = frontmatter.Post(content=abs_path.read_text(encoding="utf-8", errors="replace"))
