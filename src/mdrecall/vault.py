@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import re
 import threading
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +14,23 @@ import frontmatter
 logger = logging.getLogger(__name__)
 
 WIKILINK_RE = re.compile(r"\[\[([^\]\|#]+)(?:#[^\]\|]+)?(?:\|[^\]]+)?\]\]")
+FENCED_CODE_RE = re.compile(r"```.*?```", re.DOTALL)
+INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
+
+
+def strip_code_spans(text: str) -> str:
+    """Replace fenced and inline code regions with spaces of equal length.
+
+    Equal-length replacement preserves character offsets so callers can use
+    match positions from the masked text against the original body for snippets.
+    """
+
+    def _blank(m: re.Match[str]) -> str:
+        return " " * (m.end() - m.start())
+
+    text = FENCED_CODE_RE.sub(_blank, text)
+    text = INLINE_CODE_RE.sub(_blank, text)
+    return text
 
 
 @dataclass(frozen=True)
@@ -57,8 +74,14 @@ class Note:
             "tags": self.tags,
         }
 
+    def linkable_body(self) -> str:
+        """Body with fenced/inline code regions blanked out. Offsets preserved."""
+        return strip_code_spans(self.body)
+
     def wikilink_targets(self) -> list[str]:
-        return [_canonicalize_target(m.group(1)) for m in WIKILINK_RE.finditer(self.body)]
+        return [
+            _canonicalize_target(m.group(1)) for m in WIKILINK_RE.finditer(self.linkable_body())
+        ]
 
 
 @dataclass
@@ -127,7 +150,8 @@ class Vault:
             if cached is not None and cached.mtime == mtime:
                 return cached.note
         try:
-            post = frontmatter.load(str(abs_path))
+            with abs_path.open("r", encoding="utf-8") as fh:
+                post = frontmatter.load(fh)
         except Exception as exc:
             logger.warning("Failed to parse frontmatter for %s: %s", rel, exc)
             post = frontmatter.Post(content=abs_path.read_text(encoding="utf-8", errors="replace"))
@@ -155,9 +179,11 @@ class Vault:
         return abs_path
 
     def get_note(self, path: str) -> Note:
-        """Read and parse a single note at a vault-relative path."""
+        """Read and parse a single note. The `.md` suffix is optional."""
 
         abs_path = self.resolve(path)
+        if not abs_path.is_file() and not path.lower().endswith(".md"):
+            abs_path = self.resolve(path + ".md")
         if not abs_path.is_file():
             raise FileNotFoundError(f"Note not found: {path}")
         return self._load_note(abs_path)
@@ -174,19 +200,13 @@ class Vault:
             files = [
                 p
                 for p in base.iterdir()
-                if p.is_file()
-                and p.suffix.lower() == ".md"
-                and not p.name.startswith((".", "_"))
+                if p.is_file() and p.suffix.lower() == ".md" and not p.name.startswith((".", "_"))
             ]
         return [self._load_note(p) for p in files]
 
     def top_level_folders(self) -> list[Path]:
         return sorted(
-            (
-                p
-                for p in self.root.iterdir()
-                if p.is_dir() and not p.name.startswith((".", "_"))
-            ),
+            (p for p in self.root.iterdir() if p.is_dir() and not p.name.startswith((".", "_"))),
             key=lambda p: p.name,
         )
 

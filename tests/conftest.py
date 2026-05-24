@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vault_mcp.vault import Vault
+from mdrecall.vault import Vault
 
 
 @pytest.fixture

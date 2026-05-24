@@ -34,7 +34,7 @@ def find_backlinks(vault: Vault, path: str) -> list[dict[str, Any]]:
         if note.path == path:
             continue
         hits: list[re.Match[str]] = []
-        for match in WIKILINK_RE.finditer(note.body):
+        for match in WIKILINK_RE.finditer(note.linkable_body()):
             link_target = match.group(1)
             canonical = canonical_path(link_target)
             if canonical == target:

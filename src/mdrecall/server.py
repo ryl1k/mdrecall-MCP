@@ -13,16 +13,16 @@ from mcp.server.fastmcp import FastMCP
 from .backlinks import find_backlinks as _find_backlinks
 from .frontmatter import query_frontmatter as _query_frontmatter
 from .search import search_notes as _search_notes
-from .vault import WIKILINK_RE, Vault, canonical_path
+from .vault import Vault
 
 logging.basicConfig(
     level=logging.INFO,
     stream=sys.stderr,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
-logger = logging.getLogger("vault_mcp")
+logger = logging.getLogger("mdrecall")
 
-DEFAULT_VAULT = Path(r"D:\Documents\Knowledge")
+DEFAULT_VAULT = Path.home() / "Documents" / "Knowledge"
 
 FOLDER_DESCRIPTIONS: dict[str, str] = {
     "000-index": "Entry points and Maps of Content.",
@@ -42,7 +42,7 @@ FOLDER_DESCRIPTIONS: dict[str, str] = {
 
 def _vault() -> Vault:
     raw = os.environ.get("VAULT_PATH")
-    root = Path(raw) if raw else DEFAULT_VAULT
+    root = Path(raw).expanduser() if raw else DEFAULT_VAULT
     return Vault(root)
 
 
@@ -57,7 +57,7 @@ def vault() -> Vault:
     return _VAULT
 
 
-mcp = FastMCP("vault-mcp")
+mcp = FastMCP("mdrecall")
 
 
 @mcp.tool()
@@ -90,17 +90,19 @@ def list_notes(folder: str, recursive: bool = False) -> list[dict[str, Any]]:
 
 @mcp.tool()
 def read_note(path: str) -> dict[str, Any]:
-    """Read a single note. Returns frontmatter, body, and resolved wikilink targets."""
+    """Read a single note. Returns frontmatter, body, and resolved wikilink targets.
+
+    Accepts paths with or without the `.md` suffix.
+    """
 
     v = vault()
     note = v.get_note(path)
-    targets = [canonical_path(m.group(1)) for m in WIKILINK_RE.finditer(note.body)]
     seen: set[str] = set()
     unique_targets: list[str] = []
-    for t in targets:
-        if t not in seen:
-            seen.add(t)
-            unique_targets.append(t)
+    for target in note.wikilink_targets():
+        if target not in seen:
+            seen.add(target)
+            unique_targets.append(target)
     return {
         "path": note.path,
         "frontmatter": note.frontmatter,
@@ -135,7 +137,8 @@ def query_frontmatter(
 
     Multiple keys combine with AND. A list value for a key is any-of (e.g.
     `{"tech": ["postgresql"]}` matches notes whose `tech` array contains
-    `postgresql`).
+    `postgresql`). A `null` value matches notes where the field is null or
+    absent (e.g. `{"github": null}` finds notes with no github remote).
     """
 
     return _query_frontmatter(vault(), filters, limit=limit)

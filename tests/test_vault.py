@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vault_mcp.vault import Vault, canonical_path
+from mdrecall.vault import Vault, canonical_path
 
 
 def test_iter_notes_recursive_skips_archive(vault: Vault) -> None:
@@ -21,6 +21,8 @@ def test_iter_notes_non_recursive(vault: Vault) -> None:
         "010-projects/alpha.md",
         "010-projects/beta.md",
         "010-projects/gamma.md",
+        "010-projects/unicode-note.md",
+        "010-projects/zeta.md",
     }
 
 
@@ -41,6 +43,7 @@ def test_cache_returns_same_object_until_mtime_changes(vault: Vault, fixture_roo
     target = fixture_root / "010-projects" / "alpha.md"
     new_mtime = note1.mtime + 5
     import os
+
     os.utime(target, (new_mtime, new_mtime))
     note3 = vault.get_note("010-projects/alpha.md")
     assert note3 is not note1
@@ -51,6 +54,17 @@ def test_cache_returns_same_object_until_mtime_changes(vault: Vault, fixture_roo
 def test_get_note_missing_raises(vault: Vault) -> None:
     with pytest.raises(FileNotFoundError):
         vault.get_note("does/not/exist.md")
+
+
+def test_get_note_accepts_path_without_md_suffix(vault: Vault) -> None:
+    note = vault.get_note("010-projects/alpha")
+    assert note.path == "010-projects/alpha.md"
+    assert note.title == "Alpha Service"
+
+
+def test_get_note_missing_still_raises_without_suffix(vault: Vault) -> None:
+    with pytest.raises(FileNotFoundError):
+        vault.get_note("010-projects/no-such-note")
 
 
 def test_path_escape_rejected(vault: Vault) -> None:
@@ -66,4 +80,22 @@ def test_canonical_path() -> None:
 
 def test_count_notes_skips_underscored_dirs(vault: Vault, fixture_root: Path) -> None:
     count = vault.count_notes(fixture_root / "010-projects")
-    assert count == 3
+    assert count == 5
+
+
+def test_get_note_reads_utf8_with_non_ascii_content(vault: Vault) -> None:
+    """Vault must read files as UTF-8 regardless of OS locale (Windows defaults to cp1252)."""
+    note = vault.get_note("010-projects/unicode-note.md")
+    assert "розрахунково-графічна" in note.body
+    assert "καλημέρα" in note.body
+    assert note.title.startswith("Unicode Note")
+
+
+def test_wikilink_extraction_skips_code_spans(vault: Vault) -> None:
+    note = vault.get_note("010-projects/zeta.md")
+    targets = note.wikilink_targets()
+    assert "070-concepts/tech/python" in targets
+    assert "070-concepts/tech/postgresql" in targets
+    assert "fake-inline" not in targets
+    assert "fake-fenced" not in targets
+    assert "also-fake" not in targets
